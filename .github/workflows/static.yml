@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Créditos - Cooperativa San Hilario</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #003366; /* Azul oscuro */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #003366; /* Azul oscuro */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #002244; /* Azul más oscuro */
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f1f1f1;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Cooperativa de Ahorro y Crédito San Hilario
+</header>
+
+<div class="container">
+    <h1>Simulador de Créditos</h1>
+    
+    <label for="monto">Monto del Crédito (S/):</label>
+    <input type="number" id="monto" placeholder="Ejemplo: 5000" required>
+    
+    <label for="interes">Tasa de Interés Anual (%):</label>
+    <input type="number" id="interes" placeholder="Ejemplo: 15" required>
+    
+    <label for="plazo">Plazo del Crédito (meses):</label>
+    <input type="number" id="plazo" placeholder="Ejemplo: 12" required>
+    
+    <button onclick="calcularCredito()">Calcular Cronograma</button>
+    
+    <div id="resultado" class="result"></div>
+
+    <h3>Cronograma de Pagos</h3>
+    <table id="tabla-pagos">
+        <thead>
+            <tr>
+                <th>Mes</th>
+                <th>Cuota Mensual (S/)</th>
+                <th>Intereses (S/)</th>
+                <th>Abono al Capital (S/)</th>
+                <th>Saldo Pendiente (S/)</th>
+            </tr>
+        </thead>
+        <tbody id="detalles-pagos"></tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2024 Cooperativa de Ahorro y Crédito San Hilario. Todos los derechos reservados.</p>
+</div>
+
+<script>
+    function calcularCredito() {
+        var monto = parseFloat(document.getElementById("monto").value);
+        var tasaInteres = parseFloat(document.getElementById("interes").value) / 100;
+        var plazo = parseInt(document.getElementById("plazo").value);
+
+        // Validación de datos de entrada
+        if (isNaN(monto) || isNaN(tasaInteres) || isNaN(plazo) || monto <= 0 || tasaInteres <= 0 || plazo <= 0) {
+            alert("Por favor ingresa todos los datos correctamente.");
+            return;
+        }
+
+        // Cálculo de la cuota mensual utilizando fórmula de amortización
+        var tasaMensual = tasaInteres / 12;
+        var cuotaMensual = monto * (tasaMensual * Math.pow(1 + tasaMensual, plazo)) / (Math.pow(1 + tasaMensual, plazo) - 1);
+        var saldoPendiente = monto;
+
+        // Limpia el cronograma de pagos anterior
+        var tablaDetalles = document.getElementById("detalles-pagos");
+        tablaDetalles.innerHTML = "";
+
+        // Genera el cronograma de pagos
+        for (var mes = 1; mes <= plazo; mes++) {
+            var intereses = saldoPendiente * tasaMensual;
+            var abonoCapital = cuotaMensual - intereses;
+            saldoPendiente -= abonoCapital;
+
+            var fila = `<tr>
+                <td>${mes}</td>
+                <td>${cuotaMensual.toFixed(2)}</td>
+                <td>${intereses.toFixed(2)}</td>
+                <td>${abonoCapital.toFixed(2)}</td>
+                <td>${saldoPendiente.toFixed(2)}</td>
+            </tr>`;
+            tablaDetalles.innerHTML += fila;
+        }
+
+        // Mostrar resultado final
+        document.getElementById("resultado").innerHTML = `
+            <p><strong>Cuota Mensual: </strong>S/ ${cuotaMensual.toFixed(2)}</p>
+            <p><strong>Total a Pagar: </strong>S/ ${(cuotaMensual * plazo).toFixed(2)}</p>
+        `;
+    }
+</script>
+
+</body>
+</html>
+
